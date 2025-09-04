@@ -1,0 +1,87 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Menu, X, Stethoscope, Calendar, Users, Phone } from "lucide-react";
+
+const Header = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  return (
+    <header className="bg-white/95 backdrop-blur-sm border-b border-border sticky top-0 z-50 transition-medical">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center space-x-2">
+            <div className="p-2 bg-primary rounded-lg">
+              <Stethoscope className="h-6 w-6 text-white" />
+            </div>
+            <span className="text-2xl font-bold text-primary">MediBook</span>
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <a href="#services" className="text-foreground hover:text-primary transition-medical font-medium">
+              Services
+            </a>
+            <a href="#doctors" className="text-foreground hover:text-primary transition-medical font-medium">
+              Doctors
+            </a>
+            <a href="#appointments" className="text-foreground hover:text-primary transition-medical font-medium">
+              Book Appointment
+            </a>
+            <a href="#contact" className="text-foreground hover:text-primary transition-medical font-medium">
+              Contact
+            </a>
+          </nav>
+
+          {/* Desktop CTA Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
+            <Button variant="outline" size="sm">
+              Login
+            </Button>
+            <Button variant="medical" size="sm">
+              Book Now
+            </Button>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden p-2 hover:bg-secondary rounded-lg transition-medical"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
+
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="md:hidden mt-4 pb-4 border-t border-border pt-4">
+            <nav className="flex flex-col space-y-4">
+              <a href="#services" className="text-foreground hover:text-primary transition-medical font-medium">
+                Services
+              </a>
+              <a href="#doctors" className="text-foreground hover:text-primary transition-medical font-medium">
+                Doctors
+              </a>
+              <a href="#appointments" className="text-foreground hover:text-primary transition-medical font-medium">
+                Book Appointment
+              </a>
+              <a href="#contact" className="text-foreground hover:text-primary transition-medical font-medium">
+                Contact
+              </a>
+              <div className="flex flex-col space-y-2 pt-4">
+                <Button variant="outline" size="sm">
+                  Login
+                </Button>
+                <Button variant="medical" size="sm">
+                  Book Now
+                </Button>
+              </div>
+            </nav>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+};
+
+export default Header;
