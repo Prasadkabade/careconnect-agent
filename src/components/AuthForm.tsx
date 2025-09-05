@@ -116,8 +116,8 @@ export const AuthForm = () => {
           description: "Welcome to the admin dashboard.",
         });
         
-        // Trigger page refresh to update auth state
-        window.location.reload();
+        // Redirect to admin dashboard
+        window.location.href = '/admin-dashboard';
       } else {
         throw new Error('Invalid admin credentials');
       }

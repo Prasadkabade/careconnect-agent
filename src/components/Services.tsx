@@ -58,6 +58,9 @@ const services = [
 ];
 
 const Services = () => {
+  const goToDoctors = () => {
+    document.getElementById('doctors')?.scrollIntoView({ behavior: 'smooth' });
+  };
   return (
     <section id="services" className="py-20 bg-secondary/30">
       <div className="container mx-auto px-4">
@@ -96,7 +99,7 @@ const Services = () => {
                       </li>
                     ))}
                   </ul>
-                  <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-white transition-medical">
+                  <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-white transition-medical" onClick={goToDoctors}>
                     Learn More
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -119,8 +122,8 @@ const Services = () => {
                     Always Available
                   </div>
                 </div>
-                <Button variant="outline" className="bg-white text-primary hover:bg-white/90">
-                  Call Now
+                <Button variant="outline" className="bg-white text-primary hover:bg-white/90" asChild>
+                  <a href="tel:+11234567890">Call Now</a>
                 </Button>
               </div>
             </CardContent>
@@ -137,8 +140,8 @@ const Services = () => {
                     15+ Locations
                   </div>
                 </div>
-                <Button variant="outline" className="bg-white text-accent hover:bg-white/90">
-                  View Map
+                <Button variant="outline" className="bg-white text-accent hover:bg-white/90" asChild>
+                  <a href="https://www.google.com/maps/search/clinic+near+me" target="_blank" rel="noopener noreferrer">View Map</a>
                 </Button>
               </div>
             </CardContent>

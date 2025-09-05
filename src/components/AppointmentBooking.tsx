@@ -36,6 +36,13 @@ const timeSlots = [
   '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'
 ];
 
+// Fallback doctors used when database is unavailable
+const fallbackDoctors: Doctor[] = [
+  { id: 'd1', first_name: 'Sarah', last_name: 'Johnson', specialty: 'Cardiology', rating: 4.9, years_experience: 15, consultation_fee: 120, bio: 'Expert cardiologist specializing in preventive care.', is_available: true },
+  { id: 'd2', first_name: 'Michael', last_name: 'Chen', specialty: 'Neurology', rating: 4.8, years_experience: 12, consultation_fee: 110, bio: 'Neurologist with focus on stroke and epilepsy.', is_available: true },
+  { id: 'd3', first_name: 'Emily', last_name: 'Rodriguez', specialty: 'Pediatrics', rating: 4.9, years_experience: 10, consultation_fee: 100, bio: 'Pediatrician providing compassionate child care.', is_available: true },
+];
+
 interface AppointmentBookingProps {
   user?: User | null;
 }
@@ -80,6 +87,8 @@ export const AppointmentBooking = ({ user }: AppointmentBookingProps) => {
         description: error.message,
         variant: 'destructive',
       });
+      // Use local fallback data so the UI remains functional
+      setDoctors(fallbackDoctors);
     }
   };
 
@@ -206,7 +215,7 @@ export const AppointmentBooking = ({ user }: AppointmentBookingProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 py-12">
+    <section id="appointments" className="min-h-screen bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 py-12">
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-4">
@@ -469,6 +478,6 @@ export const AppointmentBooking = ({ user }: AppointmentBookingProps) => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };

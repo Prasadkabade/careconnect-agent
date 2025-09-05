@@ -58,13 +58,15 @@ export const Header = ({ user, onSignOut }: HeaderProps) => {
               </>
             ) : (
               <>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => document.getElementById('appointments')?.scrollIntoView({ behavior: 'smooth' })}>
                   <Calendar className="h-4 w-4 mr-2" />
                   Book Now
                 </Button>
-                <Button className="bg-gradient-primary hover:opacity-90 text-white" size="sm">
-                  <Phone className="h-4 w-4 mr-2" />
-                  Emergency
+                <Button className="bg-gradient-primary hover:opacity-90 text-white" size="sm" asChild>
+                  <a href="tel:+11234567890">
+                    <Phone className="h-4 w-4 mr-2" />
+                    Emergency
+                  </a>
                 </Button>
               </>
             )}
@@ -113,13 +115,15 @@ export const Header = ({ user, onSignOut }: HeaderProps) => {
                   </>
                 ) : (
                   <>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => document.getElementById('appointments')?.scrollIntoView({ behavior: 'smooth' })}>
                       <Calendar className="h-4 w-4 mr-2" />
                       Book Now
                     </Button>
-                    <Button className="bg-gradient-primary hover:opacity-90 text-white" size="sm">
-                      <Phone className="h-4 w-4 mr-2" />
-                      Emergency
+                    <Button className="bg-gradient-primary hover:opacity-90 text-white" size="sm" asChild>
+                      <a href="tel:+11234567890">
+                        <Phone className="h-4 w-4 mr-2" />
+                        Emergency
+                      </a>
                     </Button>
                   </>
                 )}

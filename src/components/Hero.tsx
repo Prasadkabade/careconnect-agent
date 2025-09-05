@@ -4,6 +4,9 @@ import { Calendar, Clock, Shield, Star } from "lucide-react";
 import heroImage from "@/assets/medical-hero.jpg";
 
 const Hero = () => {
+  const scrollToAppointments = () => {
+    document.getElementById('appointments')?.scrollIntoView({ behavior: 'smooth' });
+  };
   return (
     <section className="relative min-h-screen flex items-center bg-gradient-to-br from-background via-secondary/20 to-accent/10 overflow-hidden">
       {/* Background Pattern */}
@@ -33,13 +36,15 @@ const Hero = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="hero" size="lg" className="hero-shadow">
+              <Button variant="hero" size="lg" className="hero-shadow" onClick={scrollToAppointments}>
                 <Calendar className="mr-2 h-5 w-5" />
                 Book Appointment
               </Button>
-              <Button variant="outline" size="lg">
-                <Clock className="mr-2 h-5 w-5" />
-                Emergency Care
+              <Button variant="outline" size="lg" asChild>
+                <a href="tel:+11234567890">
+                  <Clock className="mr-2 h-5 w-5" />
+                  Emergency Care
+                </a>
               </Button>
             </div>
 

@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   Star, 
   Calendar,
@@ -61,6 +63,10 @@ const doctors = [
 ];
 
 const DoctorProfiles = () => {
+  const [profileDoctor, setProfileDoctor] = useState<typeof doctors[number] | null>(null);
+  const scrollToAppointments = () => {
+    document.getElementById('appointments')?.scrollIntoView({ behavior: 'smooth' });
+  };
   return (
     <section id="doctors" className="py-20 bg-background">
       <div className="container mx-auto px-4">
@@ -158,11 +164,12 @@ const DoctorProfiles = () => {
                     variant="medical" 
                     size="sm" 
                     className="flex-1"
+                    onClick={scrollToAppointments}
                   >
                     <Calendar className="mr-2 h-4 w-4" />
                     Book Appointment
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => setProfileDoctor(doctor)}>
                     View Profile
                   </Button>
                 </div>
@@ -173,12 +180,36 @@ const DoctorProfiles = () => {
 
         {/* View All Doctors CTA */}
         <div className="text-center">
-          <Button variant="outline" size="lg">
+          <Button variant="outline" size="lg" onClick={() => document.getElementById('doctors')?.scrollIntoView({ behavior: 'smooth' })}>
             View All Doctors
             <MapPin className="ml-2 h-5 w-5" />
           </Button>
         </div>
       </div>
+
+      {/* Profile Dialog */}
+      <Dialog open={!!profileDoctor} onOpenChange={(open) => { if (!open) setProfileDoctor(null); }}>
+        <DialogContent>
+          {profileDoctor && (
+            <>
+              <DialogHeader>
+                <DialogTitle>{profileDoctor.name}</DialogTitle>
+                <DialogDescription>{profileDoctor.specialty} • {profileDoctor.experience} • {profileDoctor.education}</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-3">
+                <img src={profileDoctor.image} alt={profileDoctor.name} className="w-full h-48 object-cover rounded-lg" />
+                <div className="text-sm text-muted-foreground">Languages: {profileDoctor.languages.join(", ")}</div>
+                <div className="flex flex-wrap gap-2">
+                  {profileDoctor.specialties.map((s, i) => (
+                    <Badge key={i} variant="secondary">{s}</Badge>
+                  ))}
+                </div>
+                <Button onClick={scrollToAppointments} className="w-full">Book with this Doctor</Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };
