@@ -183,4 +183,5 @@ const DoctorProfiles = () => {
   );
 };
 
+// Explicitly export as default to ensure module resolution
 export default DoctorProfiles;
