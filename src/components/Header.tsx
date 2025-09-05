@@ -1,8 +1,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Stethoscope, Calendar, Users, Phone } from "lucide-react";
+import { Menu, X, Stethoscope, Calendar, LogOut, Phone } from "lucide-react";
+import type { User } from '@supabase/supabase-js';
 
-const Header = () => {
+interface HeaderProps {
+  user?: User | null;
+  onSignOut?: () => void;
+}
+
+export const Header = ({ user, onSignOut }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -33,14 +39,35 @@ const Header = () => {
             </a>
           </nav>
 
-          {/* Desktop CTA Buttons */}
+          {/* Desktop Auth/User Section */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="outline" size="sm">
-              Login
-            </Button>
-            <Button variant="medical" size="sm">
-              Book Now
-            </Button>
+            {user ? (
+              <>
+                <span className="text-sm text-muted-foreground">
+                  Welcome, {user.email}
+                </span>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={onSignOut}
+                  className="border-red-200 text-red-600 hover:bg-red-50"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" size="sm">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Book Now
+                </Button>
+                <Button className="bg-gradient-primary hover:opacity-90 text-white" size="sm">
+                  <Phone className="h-4 w-4 mr-2" />
+                  Emergency
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -69,12 +96,33 @@ const Header = () => {
                 Contact
               </a>
               <div className="flex flex-col space-y-2 pt-4">
-                <Button variant="outline" size="sm">
-                  Login
-                </Button>
-                <Button variant="medical" size="sm">
-                  Book Now
-                </Button>
+                {user ? (
+                  <>
+                    <span className="text-sm text-muted-foreground px-2">
+                      Welcome, {user.email}
+                    </span>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={onSignOut}
+                      className="border-red-200 text-red-600 hover:bg-red-50"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" size="sm">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      Book Now
+                    </Button>
+                    <Button className="bg-gradient-primary hover:opacity-90 text-white" size="sm">
+                      <Phone className="h-4 w-4 mr-2" />
+                      Emergency
+                    </Button>
+                  </>
+                )}
               </div>
             </nav>
           </div>

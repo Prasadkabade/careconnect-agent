@@ -5,10 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar as CalendarIcon, Clock, Heart, Brain, Baby, Bone, Palette, User, Mail, Phone } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Heart, Brain, Baby, Bone, Palette, User as UserIcon, Mail, Phone } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
+import type { User } from '@supabase/supabase-js';
 
 interface Doctor {
   id: string;
@@ -35,7 +36,11 @@ const timeSlots = [
   '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'
 ];
 
-export const AppointmentBooking = ({ user }: { user: any }) => {
+interface AppointmentBookingProps {
+  user?: User | null;
+}
+
+export const AppointmentBooking = ({ user }: AppointmentBookingProps) => {
   const { toast } = useToast();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
@@ -291,8 +296,8 @@ export const AppointmentBooking = ({ user }: { user: any }) => {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="firstName">First Name</Label>
-                        <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                         <div className="relative">
+                           <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input
                             id="firstName"
                             value={formData.firstName}

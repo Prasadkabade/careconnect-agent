@@ -97,21 +97,34 @@ export const AuthForm = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: adminForm.email,
-        password: adminForm.password,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Admin access granted",
-        description: "Welcome to the admin dashboard.",
-      });
+      // Check predefined admin credentials
+      if (adminForm.email === 'admin@clinic.com' && adminForm.password === 'Admin@1234') {
+        // Create a dummy session for admin
+        const adminSession = {
+          user: {
+            id: 'admin-user-id',
+            email: 'admin@clinic.com',
+            role: 'admin'
+          }
+        };
+        
+        // Store admin session in localStorage
+        localStorage.setItem('adminSession', JSON.stringify(adminSession));
+        
+        toast({
+          title: "Admin access granted",
+          description: "Welcome to the admin dashboard.",
+        });
+        
+        // Trigger page refresh to update auth state
+        window.location.reload();
+      } else {
+        throw new Error('Invalid admin credentials');
+      }
     } catch (error: any) {
       toast({
         title: "Admin login failed",
-        description: error.message,
+        description: "Invalid username or password",
         variant: "destructive",
       });
     } finally {
