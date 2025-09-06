@@ -316,7 +316,7 @@ export const AuthForm = () => {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-secondary hover:opacity-90 text-white font-medium shadow-medical transition-all duration-300 hover:shadow-lg hover:scale-[1.02]"
+                    className="w-full bg-gradient-primary hover:opacity-90 text-white font-medium shadow-medical transition-all duration-300 hover:shadow-lg hover:scale-[1.02]"
                     disabled={isLoading}
                   >
                     {isLoading ? 'Creating Account...' : 'Create Account'}

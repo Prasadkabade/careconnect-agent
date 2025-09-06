@@ -6,6 +6,7 @@ import { AppointmentBooking } from "@/components/AppointmentBooking";
 import { AuthForm } from "@/components/AuthForm";
 import { AdminDashboard } from "@/components/AdminDashboard";
 import { Header } from "@/components/Header";
+import { Chatbot } from "@/components/Chatbot";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from '@supabase/supabase-js';
 
@@ -86,6 +87,7 @@ const Index = () => {
         <DoctorProfiles />
         <AppointmentBooking user={user} />
       </main>
+      <Chatbot />
     </div>
   );
 };

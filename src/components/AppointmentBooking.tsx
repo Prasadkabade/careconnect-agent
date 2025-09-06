@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar as CalendarIcon, Clock, Heart, Brain, Baby, Bone, Palette, User as UserIcon, Mail, Phone } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Heart, Brain, Baby, Bone, Palette, User as UserIcon, Mail, Phone, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
@@ -170,9 +170,45 @@ export const AppointmentBooking = ({ user }: AppointmentBookingProps) => {
 
       if (appointmentError) throw appointmentError;
 
+      // Send confirmation notification
+      try {
+        await supabase.functions.invoke('send-appointment-notification', {
+          body: {
+            patientEmail: formData.email,
+            patientName: `${formData.firstName} ${formData.lastName}`,
+            doctorName: `${selectedDoctor.first_name} ${selectedDoctor.last_name}`,
+            appointmentDate: formData.appointmentDate,
+            appointmentTime: formData.appointmentTime,
+            type: 'confirmation'
+          }
+        });
+
+        // Schedule reminder (in a real app, this would be handled by a background job)
+        const reminderDate = new Date(`${formData.appointmentDate} ${formData.appointmentTime}`);
+        reminderDate.setHours(reminderDate.getHours() - 2); // 2 hours before
+        
+        if (reminderDate > new Date()) {
+          setTimeout(async () => {
+            await supabase.functions.invoke('send-appointment-notification', {
+              body: {
+                patientEmail: formData.email,
+                patientName: `${formData.firstName} ${formData.lastName}`,
+                doctorName: `${selectedDoctor.first_name} ${selectedDoctor.last_name}`,
+                appointmentDate: formData.appointmentDate,
+                appointmentTime: formData.appointmentTime,
+                type: 'reminder'
+              }
+            });
+          }, reminderDate.getTime() - new Date().getTime());
+        }
+      } catch (notificationError) {
+        console.error('Failed to send notification:', notificationError);
+      }
+
       toast({
         title: 'Appointment booked!',
-        description: `Your appointment with Dr. ${selectedDoctor.first_name} ${selectedDoctor.last_name} has been scheduled for ${formData.appointmentDate} at ${formData.appointmentTime}.`,
+        description: `Your appointment with Dr. ${selectedDoctor.first_name} ${selectedDoctor.last_name} has been scheduled for ${formData.appointmentDate} at ${formData.appointmentTime}. Confirmation email sent!`,
+        duration: 5000,
       });
 
       // Reset form

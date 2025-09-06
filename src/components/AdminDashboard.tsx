@@ -180,6 +180,30 @@ export const AdminDashboard = ({ onSignOut }: { onSignOut: () => void }) => {
     }
   };
 
+  const handleAppointmentAction = async (appointmentId: string, action: 'approved' | 'rejected') => {
+    try {
+      const { error } = await supabase
+        .from('appointments')
+        .update({ status: action })
+        .eq('id', appointmentId);
+
+      if (error) throw error;
+
+      toast({
+        title: `Appointment ${action}`,
+        description: `The appointment has been ${action} successfully.`,
+      });
+
+      fetchDashboardData();
+    } catch (error: any) {
+      toast({
+        title: `Error ${action} appointment`,
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
   const handleExportData = () => {
     const csvData = appointments.map(apt => ({
       Date: apt.appointment_date,
