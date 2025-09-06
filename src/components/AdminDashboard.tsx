@@ -182,9 +182,10 @@ export const AdminDashboard = ({ onSignOut }: { onSignOut: () => void }) => {
 
   const handleAppointmentAction = async (appointmentId: string, action: 'approved' | 'rejected') => {
     try {
+      const status = action === 'approved' ? 'confirmed' : 'cancelled';
       const { error } = await supabase
         .from('appointments')
-        .update({ status: action })
+        .update({ status })
         .eq('id', appointmentId);
 
       if (error) throw error;
