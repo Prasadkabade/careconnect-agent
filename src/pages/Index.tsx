@@ -15,6 +15,7 @@ const Index = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
 
   useEffect(() => {
     // Check for admin session first
@@ -84,8 +85,8 @@ const Index = () => {
       <main>
         <Hero />
         <Services />
-        <DoctorProfiles />
-        <AppointmentBooking user={user} />
+        <DoctorProfiles onDoctorSelect={setSelectedDoctor} />
+        <AppointmentBooking user={user} preSelectedDoctor={selectedDoctor} />
       </main>
       <Chatbot />
     </div>

@@ -13,14 +13,18 @@ interface Message {
 }
 
 const predefinedResponses: { [key: string]: string } = {
-  appointment: "To book an appointment, scroll down to the 'Book Your Appointment' section, select your preferred doctor, and fill out the appointment form with your details.",
-  doctors: "Our expert doctors specialize in Cardiology, Neurology, Pediatrics, Orthopedics, and Dermatology. You can view their profiles in the 'Meet Our Expert Doctors' section.",
-  emergency: "For medical emergencies, please call 911 immediately or visit your nearest emergency room. For urgent but non-emergency care, you can call our emergency hotline.",
-  hours: "Our clinic is open Monday to Friday 9:00 AM - 6:00 PM, and Saturday 9:00 AM - 2:00 PM. We're closed on Sundays.",
-  insurance: "We accept most major insurance plans including Blue Cross, Aetna, Cigna, and United Healthcare. Please bring your insurance card to your appointment.",
-  services: "We offer comprehensive medical services including routine checkups, preventive care, specialist consultations, diagnostic tests, and emergency care.",
-  contact: "You can reach us at (555) 123-4567 or email us at info@medibook.com. Our clinic is located at 123 Medical Center Drive.",
-  default: "I'm here to help you with questions about appointments, our doctors, services, hours, and general information about our medical center. How can I assist you today?"
+  appointment: "To book an appointment, scroll down to the 'Book Your Appointment' section or click 'Book Appointment' next to any doctor in our 'Meet Our Expert Doctors' section. Follow the 3-step process: Select Doctor → Choose Date & Time → Confirm Details.",
+  doctors: "Our expert doctors include Dr. Sarah Johnson (Cardiologist), Dr. Michael Chen (Neurologist), Dr. Emily Rodriguez (Pediatrician), and Dr. James Wilson (Orthopedic Surgeon). You can view their full profiles and book directly with them in the 'Meet Our Expert Doctors' section.",
+  emergency: "For medical emergencies, please call 911 immediately or visit your nearest emergency room. For urgent but non-emergency care, you can call our emergency hotline at (555) 123-4567.",
+  hours: "Our clinic is open Monday to Friday 9:00 AM - 6:00 PM, and Saturday 9:00 AM - 2:00 PM. We're closed on Sundays. Available appointment slots are 9:00 AM - 11:30 AM and 2:00 PM - 4:30 PM.",
+  insurance: "We accept most major insurance plans including Blue Cross, Aetna, Cigna, and United Healthcare. Please bring your insurance card to your appointment. You can select your insurance carrier during the booking process.",
+  services: "We offer comprehensive medical services including routine checkups, preventive care, specialist consultations (Cardiology, Neurology, Pediatrics, Orthopedics), diagnostic tests, and emergency care. Each doctor specializes in specific treatments.",
+  contact: "You can reach us at (555) 123-4567 or email us at info@medibook.com. Our clinic is located at 123 Medical Center Drive. You can also book appointments directly through this website.",
+  fees: "Consultation fees vary by specialist: Dr. Johnson (Cardiology) - $120, Dr. Chen (Neurology) - $110, Dr. Rodriguez (Pediatrics) - $100, Dr. Wilson (Orthopedics) - $130. Fees are displayed when you select a doctor.",
+  booking: "Our 3-step booking process is: 1) Select your preferred doctor from our expert team, 2) Choose your preferred date and time (we're available Monday-Saturday), 3) Fill in your personal details and confirm. You'll receive email confirmation and reminders.",
+  notifications: "After booking, you'll receive an immediate email confirmation. We also send reminder notifications 2 hours before your scheduled appointment to both your email and phone number.",
+  admin: "Appointments require admin approval. After booking, an admin will review and either confirm or reschedule your appointment based on availability. You'll be notified of the status change.",
+  default: "I'm your MediBook assistant! I can help you with booking appointments, finding doctors, understanding our services, checking hours, insurance questions, and general information about our medical center. What would you like to know?"
 };
 
 export const Chatbot = () => {
@@ -67,6 +71,18 @@ export const Chatbot = () => {
     }
     if (lowerMessage.includes('contact') || lowerMessage.includes('phone') || lowerMessage.includes('address')) {
       return predefinedResponses.contact;
+    }
+    if (lowerMessage.includes('fee') || lowerMessage.includes('cost') || lowerMessage.includes('price') || lowerMessage.includes('payment')) {
+      return predefinedResponses.fees;
+    }
+    if (lowerMessage.includes('how to book') || lowerMessage.includes('booking process') || lowerMessage.includes('steps')) {
+      return predefinedResponses.booking;
+    }
+    if (lowerMessage.includes('notification') || lowerMessage.includes('reminder') || lowerMessage.includes('confirmation')) {
+      return predefinedResponses.notifications;
+    }
+    if (lowerMessage.includes('admin') || lowerMessage.includes('approval') || lowerMessage.includes('confirm')) {
+      return predefinedResponses.admin;
     }
     
     return predefinedResponses.default;

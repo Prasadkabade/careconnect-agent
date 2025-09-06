@@ -62,9 +62,17 @@ const doctors = [
   }
 ];
 
-const DoctorProfiles = () => {
+interface DoctorProfilesProps {
+  onDoctorSelect?: (doctor: any) => void;
+}
+
+const DoctorProfiles = ({ onDoctorSelect }: DoctorProfilesProps = {}) => {
   const [profileDoctor, setProfileDoctor] = useState<typeof doctors[number] | null>(null);
-  const scrollToAppointments = () => {
+  
+  const scrollToAppointments = (doctor?: any) => {
+    if (doctor && onDoctorSelect) {
+      onDoctorSelect(doctor);
+    }
     document.getElementById('appointments')?.scrollIntoView({ behavior: 'smooth' });
   };
   return (
@@ -164,7 +172,7 @@ const DoctorProfiles = () => {
                     variant="medical" 
                     size="sm" 
                     className="flex-1"
-                    onClick={scrollToAppointments}
+                    onClick={() => scrollToAppointments(doctor)}
                   >
                     <Calendar className="mr-2 h-4 w-4" />
                     Book Appointment
@@ -204,7 +212,7 @@ const DoctorProfiles = () => {
                     <Badge key={i} variant="secondary">{s}</Badge>
                   ))}
                 </div>
-                <Button onClick={scrollToAppointments} className="w-full">Book with this Doctor</Button>
+                <Button onClick={() => scrollToAppointments(profileDoctor)} className="w-full">Book with this Doctor</Button>
               </div>
             </>
           )}
