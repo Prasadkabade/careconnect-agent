@@ -78,4 +78,4 @@ vector_port = 54328
 gw_port = 54329
 
 [functions.send-appointment-notification]
-verify_jwt = false
+verify_jwt = true

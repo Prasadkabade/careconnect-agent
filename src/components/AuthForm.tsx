@@ -25,10 +25,6 @@ export const AuthForm = () => {
     phone: '',
   });
 
-  const [adminForm, setAdminForm] = useState({
-    email: 'admin@clinic.com',
-    password: 'Admin@1234',
-  });
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,45 +88,6 @@ export const AuthForm = () => {
     }
   };
 
-  const handleAdminLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      // Check predefined admin credentials
-      if (adminForm.email === 'admin@clinic.com' && adminForm.password === 'Admin@1234') {
-        // Create a dummy session for admin
-        const adminSession = {
-          user: {
-            id: 'admin-user-id',
-            email: 'admin@clinic.com',
-            role: 'admin'
-          }
-        };
-        
-        // Store admin session in localStorage
-        localStorage.setItem('adminSession', JSON.stringify(adminSession));
-        
-        toast({
-          title: "Admin access granted",
-          description: "Welcome to the admin dashboard.",
-        });
-        
-        // Redirect to admin dashboard
-        window.location.href = '/admin-dashboard';
-      } else {
-        throw new Error('Invalid admin credentials');
-      }
-    } catch (error: any) {
-      toast({
-        title: "Admin login failed",
-        description: "Invalid username or password",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 flex items-center justify-center p-4">
@@ -150,15 +107,12 @@ export const AuthForm = () => {
         </div>
 
         <Tabs defaultValue="login" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-card">
+          <TabsList className="grid w-full grid-cols-2 bg-card">
             <TabsTrigger value="login" className="data-[state=active]:bg-primary data-[state=active]:text-white">
               Login
             </TabsTrigger>
             <TabsTrigger value="signup" className="data-[state=active]:bg-primary data-[state=active]:text-white">
               Sign Up
-            </TabsTrigger>
-            <TabsTrigger value="admin" className="data-[state=active]:bg-accent data-[state=active]:text-white">
-              Admin
             </TabsTrigger>
           </TabsList>
 
@@ -326,61 +280,6 @@ export const AuthForm = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="admin">
-            <Card className="border-0 shadow-medical bg-card/80 backdrop-blur-sm border-accent/20">
-              <CardHeader className="space-y-2 text-center">
-                <CardTitle className="text-xl font-semibold text-foreground">
-                  Admin Access
-                </CardTitle>
-                <CardDescription>
-                  Login with predefined admin credentials
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleAdminLogin} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="adminEmail" className="text-sm font-medium">
-                      Admin Email
-                    </Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="adminEmail"
-                        type="email"
-                        value={adminForm.email}
-                        onChange={(e) => setAdminForm({ ...adminForm, email: e.target.value })}
-                        className="pl-10 border-accent/20 focus:border-accent bg-accent/5"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="adminPassword" className="text-sm font-medium">
-                      Admin Password
-                    </Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="adminPassword"
-                        type="password"
-                        value={adminForm.password}
-                        onChange={(e) => setAdminForm({ ...adminForm, password: e.target.value })}
-                        className="pl-10 border-accent/20 focus:border-accent bg-accent/5"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <Button
-                    type="submit"
-                    className="w-full bg-gradient-accent hover:opacity-90 text-white font-medium shadow-medical transition-all duration-300 hover:shadow-lg hover:scale-[1.02]"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Signing in...' : 'Admin Sign In'}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
         </Tabs>
       </div>
     </div>

@@ -18,20 +18,19 @@ const Index = () => {
   const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
 
   useEffect(() => {
-    // Check for admin session first
-    const adminSession = localStorage.getItem('adminSession');
-    if (adminSession) {
-      setIsAdmin(true);
-      setLoading(false);
-      return;
-    }
-
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Check admin role when session changes
+        if (session?.user) {
+          checkAdminRole(session.user.id);
+        } else {
+          setIsAdmin(false);
+        }
       }
     );
 
@@ -40,21 +39,35 @@ const Index = () => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      if (session?.user) {
+        checkAdminRole(session.user.id);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleSignOut = async () => {
-    if (isAdmin) {
-      localStorage.removeItem('adminSession');
+  const checkAdminRole = async (userId: string) => {
+    try {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+      
+      setIsAdmin(profile?.role === 'admin');
+    } catch (error) {
+      console.error('Error checking admin role:', error);
       setIsAdmin(false);
-      window.location.reload();
-    } else {
-      await supabase.auth.signOut();
-      setUser(null);
-      setSession(null);
     }
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setSession(null);
+    setIsAdmin(false);
   };
 
   if (loading) {

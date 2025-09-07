@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Star, 
   Calendar,
@@ -11,63 +12,34 @@ import {
   Award
 } from "lucide-react";
 
-const doctors = [
-  {
-    name: "Dr. Sarah Johnson",
-    specialty: "Cardiologist",
-    experience: "15+ years",
-    rating: 4.9,
-    reviews: 324,
-    education: "Harvard Medical School",
-    languages: ["English", "Spanish"],
-    availability: "Available Today",
-    image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop",
-    specialties: ["Heart Surgery", "Preventive Cardiology", "Arrhythmia"]
-  },
-  {
-    name: "Dr. Michael Chen",
-    specialty: "Neurologist",
-    experience: "12+ years",
-    rating: 4.8,
-    reviews: 289,
-    education: "Johns Hopkins University",
-    languages: ["English", "Mandarin"],
-    availability: "Next Available: Tomorrow",
-    image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop",
-    specialties: ["Stroke Care", "Epilepsy", "Movement Disorders"]
-  },
-  {
-    name: "Dr. Emily Rodriguez",
-    specialty: "Pediatrician",
-    experience: "10+ years",
-    rating: 4.9,
-    reviews: 456,
-    education: "Stanford Medical School",
-    languages: ["English", "Spanish", "French"],
-    availability: "Available Today",
-    image: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=400&h=400&fit=crop",
-    specialties: ["Newborn Care", "Adolescent Medicine", "Developmental Pediatrics"]
-  },
-  {
-    name: "Dr. James Wilson",
-    specialty: "Orthopedic Surgeon",
-    experience: "18+ years",
-    rating: 4.7,
-    reviews: 198,
-    education: "Mayo Clinic",
-    languages: ["English"],
-    availability: "Next Available: 2 days",
-    image: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=400&h=400&fit=crop",
-    specialties: ["Joint Replacement", "Sports Medicine", "Spine Surgery"]
-  }
-];
-
 interface DoctorProfilesProps {
   onDoctorSelect?: (doctor: any) => void;
 }
 
 const DoctorProfiles = ({ onDoctorSelect }: DoctorProfilesProps = {}) => {
-  const [profileDoctor, setProfileDoctor] = useState<typeof doctors[number] | null>(null);
+  const [doctors, setDoctors] = useState<any[]>([]);
+  const [profileDoctor, setProfileDoctor] = useState<any>(null);
+
+  useEffect(() => {
+    fetchDoctors();
+  }, []);
+
+  const fetchDoctors = async () => {
+    try {
+      // Try to fetch from safe_doctors view first (for public access)
+      const { data, error } = await supabase
+        .from('safe_doctors')
+        .select('*');
+      
+      if (error) {
+        console.error('Error fetching doctors:', error);
+      } else {
+        setDoctors(data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching doctors:', error);
+    }
+  };
   
   const scrollToAppointments = (doctor?: any) => {
     if (doctor && onDoctorSelect) {
@@ -94,77 +66,69 @@ const DoctorProfiles = ({ onDoctorSelect }: DoctorProfilesProps = {}) => {
           {doctors.map((doctor, index) => (
             <Card key={index} className="group hover:scale-[1.02] transition-bounce overflow-hidden">
               <div className="relative">
-                {/* Doctor Image */}
-                <div className="aspect-[16/10] overflow-hidden">
-                  <img 
-                    src={doctor.image} 
-                    alt={`Dr. ${doctor.name}`}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-medical"
-                  />
-                </div>
+                 {/* Doctor Image */}
+                 <div className="aspect-[16/10] overflow-hidden">
+                   <img 
+                     src={doctor.avatar_url || `https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop`} 
+                     alt={`Dr. ${doctor.first_name} ${doctor.last_name}`}
+                     className="w-full h-full object-cover group-hover:scale-110 transition-medical"
+                   />
+                 </div>
                 
-                {/* Availability Badge */}
-                <div className="absolute top-4 right-4">
-                  <Badge 
-                    className={`${
-                      doctor.availability.includes('Today') 
-                        ? 'bg-green-500 hover:bg-green-600' 
-                        : 'bg-orange-500 hover:bg-orange-600'
-                    } text-white`}
-                  >
-                    {doctor.availability}
-                  </Badge>
-                </div>
+                 {/* Availability Badge */}
+                 <div className="absolute top-4 right-4">
+                   <Badge 
+                     className={`${
+                       doctor.is_available 
+                         ? 'bg-green-500 hover:bg-green-600' 
+                         : 'bg-orange-500 hover:bg-orange-600'
+                     } text-white`}
+                   >
+                     {doctor.is_available ? 'Available' : 'Unavailable'}
+                   </Badge>
+                 </div>
               </div>
 
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-2xl">{doctor.name}</CardTitle>
-                    <CardDescription className="text-primary font-semibold text-lg">
-                      {doctor.specialty}
-                    </CardDescription>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                    <span className="font-semibold">{doctor.rating}</span>
-                    <span className="text-muted-foreground text-sm">({doctor.reviews})</span>
-                  </div>
-                </div>
-              </CardHeader>
+               <CardHeader className="pb-4">
+                 <div className="flex items-start justify-between">
+                   <div>
+                     <CardTitle className="text-2xl">Dr. {doctor.first_name} {doctor.last_name}</CardTitle>
+                     <CardDescription className="text-primary font-semibold text-lg">
+                       {doctor.specialty}
+                     </CardDescription>
+                   </div>
+                   <div className="flex items-center space-x-1">
+                     <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                     <span className="font-semibold">{doctor.rating || 5.0}</span>
+                   </div>
+                 </div>
+               </CardHeader>
 
-              <CardContent className="space-y-4">
-                {/* Experience & Education */}
-                <div className="space-y-2">
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <Award className="h-4 w-4 mr-2 text-accent" />
-                    {doctor.experience} experience
-                  </div>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <GraduationCap className="h-4 w-4 mr-2 text-accent" />
-                    {doctor.education}
-                  </div>
-                </div>
+               <CardContent className="space-y-4">
+                 {/* Experience & Bio */}
+                 <div className="space-y-2">
+                   {doctor.years_experience && (
+                     <div className="flex items-center text-sm text-muted-foreground">
+                       <Award className="h-4 w-4 mr-2 text-accent" />
+                       {doctor.years_experience}+ years experience
+                     </div>
+                   )}
+                   {doctor.consultation_fee && (
+                     <div className="flex items-center text-sm text-muted-foreground">
+                       <GraduationCap className="h-4 w-4 mr-2 text-accent" />
+                       ${doctor.consultation_fee} consultation
+                     </div>
+                   )}
+                 </div>
 
-                {/* Specialties */}
-                <div>
-                  <p className="text-sm font-medium mb-2">Specialties:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {doctor.specialties.map((specialty, specIndex) => (
-                      <Badge key={specIndex} variant="secondary" className="text-xs">
-                        {specialty}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Languages */}
-                <div>
-                  <p className="text-sm font-medium mb-2">Languages:</p>
-                  <p className="text-sm text-muted-foreground">
-                    {doctor.languages.join(", ")}
-                  </p>
-                </div>
+                 {/* Bio */}
+                 {doctor.bio && (
+                   <div>
+                     <p className="text-sm text-muted-foreground line-clamp-3">
+                       {doctor.bio}
+                     </p>
+                   </div>
+                 )}
 
                 {/* CTA Buttons */}
                 <div className="flex space-x-3 pt-4">
@@ -199,22 +163,28 @@ const DoctorProfiles = ({ onDoctorSelect }: DoctorProfilesProps = {}) => {
       <Dialog open={!!profileDoctor} onOpenChange={(open) => { if (!open) setProfileDoctor(null); }}>
         <DialogContent>
           {profileDoctor && (
-            <>
-              <DialogHeader>
-                <DialogTitle>{profileDoctor.name}</DialogTitle>
-                <DialogDescription>{profileDoctor.specialty} • {profileDoctor.experience} • {profileDoctor.education}</DialogDescription>
-              </DialogHeader>
-              <div className="space-y-3">
-                <img src={profileDoctor.image} alt={profileDoctor.name} className="w-full h-48 object-cover rounded-lg" />
-                <div className="text-sm text-muted-foreground">Languages: {profileDoctor.languages.join(", ")}</div>
-                <div className="flex flex-wrap gap-2">
-                  {profileDoctor.specialties.map((s, i) => (
-                    <Badge key={i} variant="secondary">{s}</Badge>
-                  ))}
-                </div>
-                <Button onClick={() => scrollToAppointments(profileDoctor)} className="w-full">Book with this Doctor</Button>
-              </div>
-            </>
+             <>
+               <DialogHeader>
+                 <DialogTitle>Dr. {profileDoctor.first_name} {profileDoctor.last_name}</DialogTitle>
+                 <DialogDescription>{profileDoctor.specialty} • {profileDoctor.years_experience}+ years experience</DialogDescription>
+               </DialogHeader>
+               <div className="space-y-3">
+                 <img 
+                   src={profileDoctor.avatar_url || `https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop`} 
+                   alt={`Dr. ${profileDoctor.first_name} ${profileDoctor.last_name}`} 
+                   className="w-full h-48 object-cover rounded-lg" 
+                 />
+                 {profileDoctor.bio && (
+                   <p className="text-sm text-muted-foreground">{profileDoctor.bio}</p>
+                 )}
+                 {profileDoctor.consultation_fee && (
+                   <div className="text-sm text-muted-foreground">
+                     Consultation Fee: ${profileDoctor.consultation_fee}
+                   </div>
+                 )}
+                 <Button onClick={() => scrollToAppointments(profileDoctor)} className="w-full">Book with this Doctor</Button>
+               </div>
+             </>
           )}
         </DialogContent>
       </Dialog>

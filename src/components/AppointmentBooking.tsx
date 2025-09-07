@@ -165,7 +165,7 @@ export const AppointmentBooking = ({ user, preSelectedDoctor }: AppointmentBooki
       }
 
       // Create appointment
-      const { error: appointmentError } = await supabase
+      const { data: newAppointment, error: appointmentError } = await supabase
         .from('appointments')
         .insert({
           patient_id: patientId,
@@ -175,43 +175,30 @@ export const AppointmentBooking = ({ user, preSelectedDoctor }: AppointmentBooki
           reason_for_visit: formData.reasonForVisit,
           duration_minutes: existingPatient ? 30 : 60, // 30 min for returning, 60 for new
           status: 'pending'
-        });
+        })
+        .select('id')
+        .single();
 
       if (appointmentError) throw appointmentError;
 
       // Send confirmation notification
       try {
-        await supabase.functions.invoke('send-appointment-notification', {
-          body: {
-            patientEmail: formData.email,
-            patientName: `${formData.firstName} ${formData.lastName}`,
-            doctorName: `${selectedDoctor.first_name} ${selectedDoctor.last_name}`,
-            appointmentDate: formData.appointmentDate,
-            appointmentTime: formData.appointmentTime,
-            type: 'confirmation'
-          }
-        });
-
-        // Schedule reminder (in a real app, this would be handled by a background job)
-        const reminderDate = new Date(`${formData.appointmentDate} ${formData.appointmentTime}`);
-        reminderDate.setHours(reminderDate.getHours() - 2); // 2 hours before
+        const { data: session } = await supabase.auth.getSession();
         
-        if (reminderDate > new Date()) {
-          setTimeout(async () => {
-            await supabase.functions.invoke('send-appointment-notification', {
-              body: {
-                patientEmail: formData.email,
-                patientName: `${formData.firstName} ${formData.lastName}`,
-                doctorName: `${selectedDoctor.first_name} ${selectedDoctor.last_name}`,
-                appointmentDate: formData.appointmentDate,
-                appointmentTime: formData.appointmentTime,
-                type: 'reminder'
-              }
-            });
-          }, reminderDate.getTime() - new Date().getTime());
+        if (session?.session?.access_token && newAppointment?.id) {
+          await supabase.functions.invoke('send-appointment-notification', {
+            body: {
+              appointmentId: newAppointment.id,
+              type: 'confirmation'
+            },
+            headers: {
+              'Authorization': `Bearer ${session.session.access_token}`
+            }
+          });
         }
       } catch (notificationError) {
         console.error('Failed to send notification:', notificationError);
+        // Don't fail the appointment creation if notification fails
       }
 
       toast({

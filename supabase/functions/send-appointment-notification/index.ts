@@ -1,19 +1,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "npm:resend@2.0.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
+// Create Supabase client with service role for secure operations
+const supabase = createClient(
+  Deno.env.get("SUPABASE_URL") ?? "",
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+);
+
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://39352b12-3d1e-4fe5-9a05-a4a6e100420a.sandbox.lovable.dev",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 interface NotificationRequest {
-  patientEmail: string;
-  patientName: string;
-  doctorName: string;
-  appointmentDate: string;
-  appointmentTime: string;
+  appointmentId: string;
   type: 'confirmation' | 'reminder';
 }
 
@@ -23,7 +26,75 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { patientEmail, patientName, doctorName, appointmentDate, appointmentTime, type }: NotificationRequest = await req.json();
+    // Get JWT token from Authorization header
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Missing authorization header" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Invalid or expired token" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    const { appointmentId, type }: NotificationRequest = await req.json();
+
+    // Fetch appointment details securely from database
+    const { data: appointment, error: appointmentError } = await supabase
+      .from('appointments')
+      .select(`
+        id,
+        appointment_date,
+        appointment_time,
+        patient_id,
+        doctor_id,
+        patients!inner(first_name, last_name, email),
+        doctors!inner(first_name, last_name)
+      `)
+      .eq('id', appointmentId)
+      .single();
+
+    if (appointmentError || !appointment) {
+      console.error("Appointment not found:", appointmentError);
+      return new Response(JSON.stringify({ error: "Appointment not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    // Verify user has permission to send notification for this appointment
+    const isPatient = user.id === appointment.patient_id;
+    const isDoctor = user.id === appointment.doctor_id;
+    
+    // Check if user is admin
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single();
+    
+    const isAdmin = profile?.role === 'admin';
+
+    if (!isPatient && !isDoctor && !isAdmin) {
+      return new Response(JSON.stringify({ error: "Unauthorized to send notification for this appointment" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    const patientEmail = appointment.patients.email;
+    const patientName = `${appointment.patients.first_name} ${appointment.patients.last_name}`;
+    const doctorName = `${appointment.doctors.first_name} ${appointment.doctors.last_name}`;
+    const appointmentDate = appointment.appointment_date;
+    const appointmentTime = appointment.appointment_time;
 
     const isConfirmation = type === 'confirmation';
     const subject = isConfirmation ? 'Appointment Confirmation - MediBook' : 'Appointment Reminder - MediBook';
@@ -105,7 +176,7 @@ const handler = async (req: Request): Promise<Response> => {
       html: emailHtml,
     });
 
-    console.log(`${type} email sent successfully to ${patientEmail}:`, emailResponse);
+    console.log(`${type} email sent successfully to ${patientEmail}:`, emailResponse.data?.id);
 
     return new Response(JSON.stringify({ success: true, emailId: emailResponse.data?.id }), {
       status: 200,
@@ -115,9 +186,9 @@ const handler = async (req: Request): Promise<Response> => {
       },
     });
   } catch (error: any) {
-    console.error(`Error sending ${type} notification:`, error);
+    console.error(`Error sending notification:`, error.message);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "Failed to send notification" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
