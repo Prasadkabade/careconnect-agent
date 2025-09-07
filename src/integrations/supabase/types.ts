@@ -69,6 +69,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "appointments_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "safe_doctors"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "appointments_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
@@ -111,6 +118,13 @@ export type Database = {
             columns: ["doctor_id"]
             isOneToOne: false
             referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_schedules_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "safe_doctors"
             referencedColumns: ["id"]
           },
         ]
@@ -255,7 +269,45 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      safe_doctors: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          consultation_fee: number | null
+          first_name: string | null
+          id: string | null
+          is_available: boolean | null
+          last_name: string | null
+          rating: number | null
+          specialty: string | null
+          years_experience: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          consultation_fee?: number | null
+          first_name?: string | null
+          id?: string | null
+          is_available?: boolean | null
+          last_name?: string | null
+          rating?: number | null
+          specialty?: string | null
+          years_experience?: number | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          consultation_fee?: number | null
+          first_name?: string | null
+          id?: string | null
+          is_available?: boolean | null
+          last_name?: string | null
+          rating?: number | null
+          specialty?: string | null
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
