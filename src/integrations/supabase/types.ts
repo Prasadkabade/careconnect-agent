@@ -19,46 +19,46 @@ export type Database = {
           appointment_date: string
           appointment_time: string
           confirmation_sent: boolean | null
-          created_at: string | null
-          doctor_id: string | null
-          duration_minutes: number
+          created_at: string
+          doctor_id: string
+          duration_minutes: number | null
           id: string
           notes: string | null
-          patient_id: string | null
+          patient_id: string
           reason_for_visit: string | null
           reminder_sent: boolean | null
           status: Database["public"]["Enums"]["appointment_status"] | null
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
           appointment_date: string
           appointment_time: string
           confirmation_sent?: boolean | null
-          created_at?: string | null
-          doctor_id?: string | null
-          duration_minutes?: number
+          created_at?: string
+          doctor_id: string
+          duration_minutes?: number | null
           id?: string
           notes?: string | null
-          patient_id?: string | null
+          patient_id: string
           reason_for_visit?: string | null
           reminder_sent?: boolean | null
           status?: Database["public"]["Enums"]["appointment_status"] | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
           appointment_date?: string
           appointment_time?: string
           confirmation_sent?: boolean | null
-          created_at?: string | null
-          doctor_id?: string | null
-          duration_minutes?: number
+          created_at?: string
+          doctor_id?: string
+          duration_minutes?: number | null
           id?: string
           notes?: string | null
-          patient_id?: string | null
+          patient_id?: string
           reason_for_visit?: string | null
           reminder_sent?: boolean | null
           status?: Database["public"]["Enums"]["appointment_status"] | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -86,27 +86,27 @@ export type Database = {
       }
       doctor_schedules: {
         Row: {
-          created_at: string | null
+          created_at: string
           day_of_week: number
-          doctor_id: string | null
+          doctor_id: string
           end_time: string
           id: string
           is_available: boolean | null
           start_time: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           day_of_week: number
-          doctor_id?: string | null
+          doctor_id: string
           end_time: string
           id?: string
           is_available?: boolean | null
           start_time: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           day_of_week?: number
-          doctor_id?: string | null
+          doctor_id?: string
           end_time?: string
           id?: string
           is_available?: boolean | null
@@ -131,139 +131,140 @@ export type Database = {
       }
       doctors: {
         Row: {
-          avatar_url: string | null
           bio: string | null
           consultation_fee: number | null
-          created_at: string | null
-          email: string
-          first_name: string
+          created_at: string
           id: string
           is_available: boolean | null
-          last_name: string
-          phone: string | null
           rating: number | null
           specialty: string
-          updated_at: string | null
+          updated_at: string
+          user_id: string | null
           years_experience: number | null
         }
         Insert: {
-          avatar_url?: string | null
           bio?: string | null
           consultation_fee?: number | null
-          created_at?: string | null
-          email: string
-          first_name: string
+          created_at?: string
           id?: string
           is_available?: boolean | null
-          last_name: string
-          phone?: string | null
           rating?: number | null
           specialty: string
-          updated_at?: string | null
+          updated_at?: string
+          user_id?: string | null
           years_experience?: number | null
         }
         Update: {
-          avatar_url?: string | null
           bio?: string | null
           consultation_fee?: number | null
-          created_at?: string | null
-          email?: string
-          first_name?: string
+          created_at?: string
           id?: string
           is_available?: boolean | null
-          last_name?: string
-          phone?: string | null
           rating?: number | null
           specialty?: string
-          updated_at?: string | null
+          updated_at?: string
+          user_id?: string | null
           years_experience?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "doctors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       patients: {
         Row: {
           address: string | null
-          created_at: string | null
+          created_at: string
           date_of_birth: string
-          email: string
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
-          first_name: string
           id: string
           insurance_carrier: string | null
           insurance_group_number: string | null
           insurance_member_id: string | null
-          last_name: string
           patient_type: Database["public"]["Enums"]["patient_type"] | null
-          phone: string
-          updated_at: string | null
+          updated_at: string
+          user_id: string | null
         }
         Insert: {
           address?: string | null
-          created_at?: string | null
+          created_at?: string
           date_of_birth: string
-          email: string
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
-          first_name: string
           id?: string
           insurance_carrier?: string | null
           insurance_group_number?: string | null
           insurance_member_id?: string | null
-          last_name: string
           patient_type?: Database["public"]["Enums"]["patient_type"] | null
-          phone: string
-          updated_at?: string | null
+          updated_at?: string
+          user_id?: string | null
         }
         Update: {
           address?: string | null
-          created_at?: string | null
+          created_at?: string
           date_of_birth?: string
-          email?: string
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
-          first_name?: string
           id?: string
           insurance_carrier?: string | null
           insurance_group_number?: string | null
           insurance_member_id?: string | null
-          last_name?: string
           patient_type?: Database["public"]["Enums"]["patient_type"] | null
-          phone?: string
-          updated_at?: string | null
+          updated_at?: string
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "patients_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       user_profiles: {
         Row: {
-          created_at: string | null
+          avatar_url: string | null
+          created_at: string
+          email: string
           first_name: string | null
           id: string
           last_name: string | null
           phone: string | null
-          role: Database["public"]["Enums"]["user_role"] | null
-          updated_at: string | null
-          user_id: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          user_id: string
         }
         Insert: {
-          created_at?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          email: string
           first_name?: string | null
           id?: string
           last_name?: string | null
           phone?: string | null
-          role?: Database["public"]["Enums"]["user_role"] | null
-          updated_at?: string | null
-          user_id?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id: string
         }
         Update: {
-          created_at?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
           first_name?: string | null
           id?: string
           last_name?: string | null
           phone?: string | null
-          role?: Database["public"]["Enums"]["user_role"] | null
-          updated_at?: string | null
-          user_id?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -282,30 +283,6 @@ export type Database = {
           specialty: string | null
           years_experience: number | null
         }
-        Insert: {
-          avatar_url?: string | null
-          bio?: string | null
-          consultation_fee?: number | null
-          first_name?: string | null
-          id?: string | null
-          is_available?: boolean | null
-          last_name?: string | null
-          rating?: number | null
-          specialty?: string | null
-          years_experience?: number | null
-        }
-        Update: {
-          avatar_url?: string | null
-          bio?: string | null
-          consultation_fee?: number | null
-          first_name?: string | null
-          id?: string | null
-          is_available?: boolean | null
-          last_name?: string | null
-          rating?: number | null
-          specialty?: string | null
-          years_experience?: number | null
-        }
         Relationships: []
       }
     }
@@ -321,7 +298,7 @@ export type Database = {
     Enums: {
       appointment_status: "pending" | "confirmed" | "cancelled" | "completed"
       patient_type: "new" | "returning"
-      user_role: "admin" | "patient" | "doctor"
+      user_role: "patient" | "doctor" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -451,7 +428,7 @@ export const Constants = {
     Enums: {
       appointment_status: ["pending", "confirmed", "cancelled", "completed"],
       patient_type: ["new", "returning"],
-      user_role: ["admin", "patient", "doctor"],
+      user_role: ["patient", "doctor", "admin"],
     },
   },
 } as const

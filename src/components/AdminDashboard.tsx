@@ -104,21 +104,32 @@ export const AdminDashboard = ({ onSignOut }: { onSignOut: () => void }) => {
     try {
       setIsLoading(true);
       
-      // Fetch patients
+      // Fetch patients with user profiles
       const { data: patientsData, error: patientsError } = await supabase
         .from('patients')
-        .select('*')
+        .select(`
+          *,
+          user_profiles (
+            first_name,
+            last_name,
+            email,
+            phone
+          )
+        `)
         .order('created_at', { ascending: false });
 
       if (patientsError) throw patientsError;
 
-      // Fetch doctors
+      // Fetch doctors with user profiles
       const { data: doctorsData, error: doctorsError } = await supabase
         .from('doctors')
-        .select('*')
-        .order('first_name');
-
-      if (doctorsError) throw doctorsError;
+        .select(`
+          *,
+          user_profiles (
+            first_name,
+            last_name
+          )
+        `);
 
       // Fetch appointments with patient and doctor details
       const { data: appointmentsData, error: appointmentsError } = await supabase
@@ -142,9 +153,30 @@ export const AdminDashboard = ({ onSignOut }: { onSignOut: () => void }) => {
 
       if (appointmentsError) throw appointmentsError;
 
-      setPatients(patientsData || []);
-      setDoctors(doctorsData || []);
-      setAppointments(appointmentsData || []);
+      // Transform data to match interfaces
+      const transformedPatients = (patientsData || []).map((p: any) => ({
+        ...p,
+        first_name: p.user_profiles?.first_name || '',
+        last_name: p.user_profiles?.last_name || '',
+        email: p.user_profiles?.email || '',
+        phone: p.user_profiles?.phone || '',
+      }));
+
+      const transformedDoctors = (doctorsData || []).map((d: any) => ({
+        ...d,
+        first_name: d.user_profiles?.first_name || '',
+        last_name: d.user_profiles?.last_name || '',
+      }));
+
+      const transformedAppointments = (appointmentsData || []).map((a: any) => ({
+        ...a,
+        patients: a.patients || { first_name: '', last_name: '', email: '', phone: '', patient_type: 'new' },
+        doctors: a.doctors || { first_name: '', last_name: '', specialty: '' }
+      }));
+
+      setPatients(transformedPatients);
+      setDoctors(transformedDoctors);
+      setAppointments(transformedAppointments);
     } catch (error: any) {
       toast({
         title: 'Error fetching data',
